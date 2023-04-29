@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../authactivity/authscreen.dart';
 import '../authactivity/signupscreen.dart';
 import '../mainmenuactivity/menuscreen.dart';
+import '../ticketactivity/openticketscreen.dart';
 import '../ticketactivity/ticketscreen.dart';
 
 void main() async {
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
             const MainMenuActivity(title: "Menu Directory Page")),
         '/signup': ((context) => SignUpActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
+        '/openticketform' : ((context) => OpenTicketActivity()),
       },
     );
   }

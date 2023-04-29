@@ -49,7 +49,10 @@ class MenuViewPageState extends State<MenuView> {
                             FontWeight.bold) // Change the font size to 20
                     ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                // THIS NEEDS TO BE ADJUSTED SINCE IT TAKES US TO THE FORM FOR TESTING BUT NOT THE ACTUAL OPEN TICKETS
+                Navigator.pushNamed(context, '/openticketform');
+              },
               child: Text('View Open Tickets'),
             ),
           ),
