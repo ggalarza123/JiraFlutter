@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "250281844735",
+    "project_id": "jiraimitation",
+    "storage_bucket": "jiraimitation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250281844735:android:ad727ca24166de78d551ca",
+        "android_client_info": {
+          "package_name": "com.example.jira_imitation_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250281844735-f0m4v8oo90oa3geqgrb3dg92hod75g64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBig-VY8peV_SxHY-uNX6f254eHtMipYks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "250281844735-f0m4v8oo90oa3geqgrb3dg92hod75g64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
