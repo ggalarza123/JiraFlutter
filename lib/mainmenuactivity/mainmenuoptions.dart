@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuView extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ Future<void> logOut(context) async {
   await auth.signOut();
   Navigator.pushNamed(context, '/login');
 }
+
 
 class MenuViewPageState extends State<MenuView> {
   @override
@@ -41,6 +43,7 @@ class MenuViewPageState extends State<MenuView> {
                       ),
                 ),
                 onPressed: () {
+
                   Navigator.pushNamed(context, '/ticket-form');
                 },
                 child: Text('Create Ticket'),
@@ -60,8 +63,9 @@ class MenuViewPageState extends State<MenuView> {
                       ),
                 ),
                 onPressed: () {
+
                   // THIS NEEDS TO BE ADJUSTED SINCE IT TAKES US TO THE FORM FOR TESTING BUT NOT THE ACTUAL OPEN TICKETS
-                  Navigator.pushNamed(context, '/openticketform');
+                  Navigator.pushNamed(context, '/newticketlist');
                 },
                 child: Text('View Open Tickets'),
               ),

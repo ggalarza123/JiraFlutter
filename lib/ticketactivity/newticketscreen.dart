@@ -1,13 +1,13 @@
 import "package:flutter/material.dart";
-import "package:jira_imitation_app/ticketactivity/openticketform.dart";
+import "package:jira_imitation_app/ticketactivity/newticketform.dart";
 
-class OpenTicketActivity extends StatefulWidget {
+class NewTicketActivity extends StatefulWidget {
   @override
-  _openticketState createState() => _openticketState();
+  NewTicketState createState() => NewTicketState();
 }
 
 // Pretty much every state will return a widget
-class _openticketState extends State<OpenTicketActivity> {
+class NewTicketState extends State<NewTicketActivity> {
   @override
   Widget build(BuildContext context) {
     // Scaffold holds pretty much the app bar and the body of a page
@@ -15,7 +15,7 @@ class _openticketState extends State<OpenTicketActivity> {
       appBar: AppBar(
         title: Text('Add Ticket'),
       ),
-      body: OpenTicketForm(),
+      body: NewTicketForm(),
     );
   }
 }

@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'newticketform.dart';
+import 'notesform.dart';
 
-class TicketForm extends StatefulWidget {
-  TicketForm({Key? key}) : super(key: key);
+
+class NewTicketForm extends StatefulWidget {
+  NewTicketForm({Key? key}) : super(key: key);
   @override
-  TicketFormState createState() => TicketFormState();
+  NewTicketFormState createState() => NewTicketFormState();
 }
 
 Future<bool?> loadTicket() async {
@@ -17,7 +17,7 @@ Future<bool?> loadTicket() async {
   return prefs.getBool('isTicketOpen');
 }
 
-class TicketFormState extends State<TicketForm> {
+class NewTicketFormState extends State<NewTicketForm> {
 
 // Initial Selected Value
   String dropdownvalue = 'Bug';
@@ -189,18 +189,63 @@ class TicketFormState extends State<TicketForm> {
                                 fontSize: 22,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                            ),
+                        ),
                       ),
                       onPressed: () {
                         createTicket(discriptionController.text.trim(),
                             categoryController.value, severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
-                      child: Text('CREATE TICKET'),
+                      child: Text('Save updated ticket'),
                     ),
                   ),
                   const SizedBox(
                     height: 20,
+                  ),
+                  NotesForm(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        textStyle: MaterialStateProperty.all<TextStyle>(
+                            const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight
+                                    .bold) // Change the font size to 20
+                        ),
+                      ),
+                      onPressed: () {
+
+                      },
+                      // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
+                      child: Text('Send creator of ticket message.'),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        textStyle: MaterialStateProperty.all<TextStyle>(
+                            const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight
+                                    .bold) // Change the font size to 20
+                        ),
+                      ),
+                      onPressed: () {
+
+                      },
+                      // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
+                      child: Text('Mark as completed'),
+                    ),
                   ),
                 ],
               ),
