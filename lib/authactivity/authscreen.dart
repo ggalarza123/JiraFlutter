@@ -1,14 +1,13 @@
-import "package:flutter/material.dart";
-
-import "authform.dart";
+import 'package:flutter/material.dart';
+import 'package:jira_imitation_app/authactivity/authform.dart';
 
 class AuthActivity extends StatefulWidget {
   @override
-  _authScreenState createState() => _authScreenState();
+  AuthScreenState createState() => AuthScreenState();
 }
 
 // Pretty much every state will return a widget
-class _authScreenState extends State<AuthActivity> {
+class AuthScreenState extends State<AuthActivity> {
   @override
   Widget build(BuildContext context) {
     // Scaffold holds pretty much the app bar and the body of a page
@@ -17,7 +16,7 @@ class _authScreenState extends State<AuthActivity> {
         title: Text('Login/Signup'),
       ),
       // body will use the authform.dart by creating an instance
-      body: Authform(),
+      body: AuthForm(),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -8,8 +10,13 @@ class TicketForm extends StatefulWidget {
 }
 
 class TicketFormState extends State<TicketForm> {
+  final _formkey = GlobalKey<FormState>();
 // Initial Selected Value
   String dropdownvalue = 'Bug';
+  String dropdownvalue2 = 'Low';
+  final discriptionController = TextEditingController();
+  final categoryController = ValueNotifier<String>("Bug");
+  final severityController = ValueNotifier<String>("Low");
 
   // List of items in our dropdown menu
   var items = [
@@ -21,9 +28,32 @@ class TicketFormState extends State<TicketForm> {
     'Underwriting'
   ];
 
-  String dropdownvalue2 = 'Low';
-
   var items2 = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
+
+  void createTicket(
+      String description, String category, String severity) async {
+    await FirebaseFirestore.instance.collection('newtickets').add({
+      'description': description,
+      'category': category,
+      'severity': severity,
+    });
+
+    // final validity = _formkey.currentState!.validate();
+    // FirebaseAuth auth = FirebaseAuth.instance;
+    // final User? user = auth.currentUser;
+    // final uid = user!.uid;
+    // var time = DateTime.now();
+    // await FirebaseFirestore.instance
+    //     .collection('tickets')
+    //     .doc(uid)
+    //     .collection('newtickets')
+    //     .doc(time.toString())
+    //     .set({
+    //   'description': ticketDiscriptionController.text,
+    //   'category': categoryController.value,
+    //   'severity': severityController.value,
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +83,11 @@ class TicketFormState extends State<TicketForm> {
                     ),
                   ),
                   TextFormField(
-                    key: const ValueKey('email'),
+                    controller: discriptionController,
                     minLines: 2,
                     maxLines: null,
                     validator: (value) {
-                      final String des = "";
-                      if (des.isEmpty) {
+                      if (value!.isEmpty) {
                         return "Enter a description";
                       }
                       return null;
@@ -88,7 +117,7 @@ class TicketFormState extends State<TicketForm> {
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: dropdownvalue,
+                      value: categoryController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
                       dropdownColor: Colors.grey,
@@ -103,8 +132,11 @@ class TicketFormState extends State<TicketForm> {
                       // After selecting the desired option,it will
                       // change button value to selected value
                       onChanged: (String? newValue) {
+                        // or just
+                        // categoryController.value = newValue!;
+                        // without the setState method
                         setState(() {
-                          dropdownvalue = newValue!;
+                          categoryController.value = newValue!;
                         });
                       },
                     ),
@@ -124,16 +156,17 @@ class TicketFormState extends State<TicketForm> {
                         color: Colors.grey,
                         width: 1.0,
                       ),
-                      borderRadius: BorderRadius.all(
+                      borderRadius: const BorderRadius.all(
                         Radius.circular(4.0),
                       ),
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: dropdownvalue2,
+                      value: severityController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
-                      dropdownColor: Colors.grey,
+                      dropdownColor: const Color.fromRGBO(
+                          231, 232, 232, 1.0),
                       isExpanded: true,
                       // Array list of items
                       items: items2.map((String items) {
@@ -146,7 +179,7 @@ class TicketFormState extends State<TicketForm> {
                       // change button value to selected value
                       onChanged: (String? newValue) {
                         setState(() {
-                          dropdownvalue2 = newValue!;
+                          severityController.value = newValue!;
                         });
                       },
                     ),
@@ -166,7 +199,10 @@ class TicketFormState extends State<TicketForm> {
                                     .bold) // Change the font size to 20
                             ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        createTicket(discriptionController.text.trim(),
+                            categoryController.value, severityController.value);
+                      },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('CREATE TICKET'),
                     ),
