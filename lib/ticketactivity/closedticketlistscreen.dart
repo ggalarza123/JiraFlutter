@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 class ClosedTicketListPage extends StatefulWidget {
   const ClosedTicketListPage({super.key, required this.title});
   final String title;
@@ -19,6 +18,7 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
     super.initState();
     getUID();
   }
+
   getUID() {
     FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
@@ -29,7 +29,6 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
 
   var fields = {'mainCollection': 'tickets'};
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +37,11 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
       ),
       body: Container(
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection(fields['mainCollection']!).doc(uid).collection('closedTickets').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection(fields['mainCollection']!)
+              .doc(uid)
+              .collection('closedTickets')
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(child: CircularProgressIndicator());
@@ -50,14 +53,15 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
                     return ListTile(
                       onTap: () {
                         // code to open ticket item details
-                        Navigator.pushNamed(context, '/ticket-form', arguments: {
-                          'severity': docs[index]['severity'],
-                          'category': docs[index]['category'],
-                          'description': docs[index]['description'],
-                          'time': docs[index]['time'],
-                          'isExistingTicket': true,
-                          'isTicketClosed': true,
-                        });
+                        Navigator.pushNamed(context, '/ticket-form',
+                            arguments: {
+                              'severity': docs[index]['severity'],
+                              'category': docs[index]['category'],
+                              'description': docs[index]['description'],
+                              'time': docs[index]['time'],
+                              'isExistingTicket': true,
+                              'isTicketClosed': true,
+                            });
                       },
                       title: Row(
                         children: [

@@ -49,12 +49,23 @@ class AuthFormState extends State<AuthForm> {
   }
 
   Future addUserDetails(String email, String username, String role) async {
-    await FirebaseFirestore.instance.collection('userdetails').add({
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final uid = user!.uid;
+    var time = DateTime.now();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('userDetails')
+        .doc(time.toString())
+        .set({
       'email': email,
       'username': username,
       'company-role': role,
       'userID': FirebaseAuth.instance.currentUser?.uid,
+      'time': time,
     });
+
     Navigator.pushNamed(context, '/main-menu');
   }
 

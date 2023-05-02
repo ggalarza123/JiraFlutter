@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TicketForm extends StatefulWidget {
   TicketForm({Key? key}) : super(key: key);
@@ -53,40 +51,67 @@ class TicketFormState extends State<TicketForm> {
     });
   }
 
-
   void createTicket(
       String description, String category, String severity) async {
-
     FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     final uid = user!.uid;
     var time = DateTime.now();
 
+    // await FirebaseFirestore.instance
+    //     .collection('tickets')
+    //     .doc(uid)
+    //     .collection('newTickets')
+    //     .doc(time.toString())
+    //     .set({
+    //   'description': description,
+    //   'category': category,
+    //   'severity': severity,
+    //   'time': time.toString(),
+    // });
 
-    await FirebaseFirestore.instance.collection('tickets').doc(uid).collection('newTickets').doc(time.toString()).set(
-      { 'description': description,
-        'category': category,
-        'severity': severity,
-        'time': time.toString(),
-      });
+
+    await FirebaseFirestore.instance.collection('newtickets').add({
+    'description': description,
+    'category': category,
+    'severity': severity,
+      'time': time.toString(),
+    });
+
+
+
+
     Fluttertoast.showToast(msg: "Saved");
     Navigator.pushNamed(context, '/main-menu');
   }
 
-  void closeTicket(String time, String text, String dropdowncategory, String dropdownseverity, ) async {
+  void closeTicket(
+    String time,
+    String text,
+    String dropdowncategory,
+    String dropdownseverity,
+  ) async {
+    FirebaseFirestore.instance
+        .collection('tickets')
+        .doc(uid)
+        .collection('closedTickets')
+        .doc(time.toString())
+        .set({
+      'description': text,
+      'category': dropdowncategory,
+      'severity': dropdownseverity,
+      'time': time,
+    });
 
-  FirebaseFirestore.instance.collection('tickets').doc(uid).collection('closedTickets').doc(time.toString()).set(
-        { 'description': text,
-          'category': dropdowncategory,
-          'severity': dropdownseverity,
-          'time': time,
-        });
-
-  FirebaseFirestore.instance.collection(fields['mainCollection']!).doc(uid).collection('newTickets').doc(time).delete();
-  Fluttertoast.showToast(msg: "Moved to closed.");
-  Navigator.pushNamed(context, '/main-menu');
+    FirebaseFirestore.instance
+        .collection(fields['mainCollection']!)
+        .doc(uid)
+        .collection('newTickets')
+        .doc(time)
+        .delete();
+    Fluttertoast.showToast(msg: "Moved to closed.");
+    Navigator.pushNamed(context, '/main-menu');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +126,6 @@ class TicketFormState extends State<TicketForm> {
       if (arguments['isTicketClosed'] != null) {
         isTicketClosed = arguments['isTicketClosed'];
       }
-
     }
 
     return SizedBox(
@@ -234,40 +258,41 @@ class TicketFormState extends State<TicketForm> {
                     height: 20,
                   ),
                   if (!isTicketClosed)
-                  SizedBox(
-                    height: 60,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        textStyle: MaterialStateProperty.all<TextStyle>(
-                            const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight
-                                    .bold) // Change the font size to 20
-                            ),
-                      ),
-                      onPressed: () {
-                        isExistingTicket
-                            ? closeTicket(time, discriptionController.text, dropdowncategory, dropdownseverity)
-                            : createTicket(
-                                discriptionController.text.trim(),
-                                categoryController.value,
-                                severityController.value);
-                      },
-                      // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
-                      child: Text(() {
-                        if (companyRole == 'IT') {
-                          return 'Move to open ticket queue';
-                        } else {
-                          if (isExistingTicket ) {
-                            return 'Close Ticket';
+                    SizedBox(
+                      height: 60,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          textStyle: MaterialStateProperty.all<TextStyle>(
+                              const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight
+                                      .bold) // Change the font size to 20
+                              ),
+                        ),
+                        onPressed: () {
+                          isExistingTicket
+                              ? closeTicket(time, discriptionController.text,
+                                  dropdowncategory, dropdownseverity)
+                              : createTicket(
+                                  discriptionController.text.trim(),
+                                  categoryController.value,
+                                  severityController.value);
+                        },
+                        // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
+                        child: Text(() {
+                          if (companyRole == 'IT') {
+                            return 'Move to open ticket queue';
                           } else {
-                            return 'Create New Ticket';
+                            if (isExistingTicket) {
+                              return 'Close Ticket';
+                            } else {
+                              return 'Create New Ticket';
+                            }
                           }
-                        }
-                      }()),
+                        }()),
+                      ),
                     ),
-                  ),
                   const SizedBox(
                     height: 20,
                   ),

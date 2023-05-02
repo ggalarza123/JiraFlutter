@@ -26,9 +26,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: StreamBuilder<User?>(
+      home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
+
         builder: (context, snapshot) {
+
           if (snapshot.hasData) {
             return MainMenuActivity(title: "Menu Directory Page");
           } else {
