@@ -3,15 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class NewTicketListPage extends StatefulWidget {
-  const NewTicketListPage({super.key, required this.title});
-  final String title;
+class TicketInProgressListPage extends StatefulWidget {
+  const TicketInProgressListPage({super.key});
 
   @override
-  State<NewTicketListPage> createState() => NewTicketListPageState();
+  State<TicketInProgressListPage> createState() =>
+      TicketInProgressListPageState();
 }
 
-class NewTicketListPageState extends State<NewTicketListPage> {
+class TicketInProgressListPageState extends State<TicketInProgressListPage> {
   String uid = "";
   @override
   void initState() {
@@ -33,11 +33,16 @@ class NewTicketListPageState extends State<NewTicketListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        // title: Text("IF wanted title can go here"),
       ),
       body: Container(
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('newtickets').snapshots(),
+          // stream needs to be for user specific
+          stream: FirebaseFirestore.instance
+              .collection(fields['mainCollection']!)
+              .doc(uid)
+              .collection('myTickets')
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(child: CircularProgressIndicator());
@@ -54,9 +59,9 @@ class NewTicketListPageState extends State<NewTicketListPage> {
                               'severity': docs[index]['severity'],
                               'category': docs[index]['category'],
                               if (docs[index]['description'] != null)
-                              'description': docs[index]['description'],
+                                'description': docs[index]['description'],
                               if (docs[index].data().containsKey('time'))
-                              'time': docs[index]['time'],
+                                'time': docs[index]['time'],
                               'isExistingTicket': true,
                             });
                       },

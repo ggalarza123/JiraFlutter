@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:jira_imitation_app/onstartactivity/uniqueuserdata.dart';
 
 class MenuView extends StatefulWidget {
   @override
@@ -29,6 +29,12 @@ class MenuViewPageState extends State<MenuView> {
                   fontSize: 40,
                 ),
               ),
+              Text(
+                ' ${UniqueUserData.userName ?? ''}',
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
               const SizedBox(height: 80),
               SizedBox(
                 width: 250,
@@ -43,11 +49,22 @@ class MenuViewPageState extends State<MenuView> {
                         ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/ticket-form', arguments: {
-                      'isExistingTicket': false,
-                    });
+                    if (UniqueUserData.companyRole != 'IT') {
+                      Navigator.pushNamed(context, '/ticket-form', arguments: {
+                        'isExistingTicket': false,
+                      });
+                    } else {
+                      Navigator.pushNamed(context, '/newticketlist');
+                    }
+
                   },
-                  child: Text('Create Ticket'),
+                  child: Text(() {
+                    if (UniqueUserData.companyRole == 'IT') {
+                      return 'View New Tickets';
+                    } else {
+                      return 'Create Ticket';
+                    }
+                  }()),
                 ),
               ),
               const SizedBox(height: 50),
@@ -64,10 +81,24 @@ class MenuViewPageState extends State<MenuView> {
                         ),
                   ),
                   onPressed: () {
-                    // THIS NEEDS TO BE ADJUSTED SINCE IT TAKES US TO THE FORM FOR TESTING BUT NOT THE ACTUAL OPEN TICKETS
-                    Navigator.pushNamed(context, '/newticketlist');
+
+                    if (UniqueUserData.companyRole != 'IT') {
+                      Navigator.pushNamed(context, '/newticketlist');
+                    } else {
+                      // testlistInProgressPageTickets
+                      Navigator.pushNamed(context, '/testlistInProgressPageTickets');
+                     // myTicketQueue does not yet exsist, once created need to place here *************************
+                     //  **************************
+                    }
+
                   },
-                  child: Text('View Open Tickets'),
+                  child: Text(() {
+                    if (UniqueUserData.companyRole == 'IT') {
+                      return 'View My Ticket Queue';
+                    } else {
+                      return 'View Open Tickets';
+                    }
+                  }()),
                 ),
               ),
               const SizedBox(height: 50),
@@ -84,9 +115,20 @@ class MenuViewPageState extends State<MenuView> {
                         ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/closedticketlist');
+                    if (UniqueUserData.companyRole != 'IT') {
+                      Navigator.pushNamed(context, '/closedticketlist');
+                    } else {
+                      // NEED completed ticket queue
+                    }
+
                   },
-                  child: Text('View Closed Tickets'),
+                  child: Text(() {
+                    if (UniqueUserData.companyRole == 'IT') {
+                      return 'View Completed Tickets';
+                    } else {
+                      return 'View Closed Tickets';
+                    }
+                  }()),
                 ),
               ),
             ],

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jira_imitation_app/onstartactivity/uniqueuserdata.dart';
 
 class TicketForm extends StatefulWidget {
   TicketForm({Key? key}) : super(key: key);
@@ -58,44 +59,76 @@ class TicketFormState extends State<TicketForm> {
     final uid = user!.uid;
     var time = DateTime.now();
 
-    // await FirebaseFirestore.instance
-    //     .collection('tickets')
-    //     .doc(uid)
-    //     .collection('newTickets')
-    //     .doc(time.toString())
-    //     .set({
-    //   'description': description,
-    //   'category': category,
-    //   'severity': severity,
-    //   'time': time.toString(),
-    // });
-
-
-    await FirebaseFirestore.instance.collection('newtickets').add({
-    'description': description,
-    'category': category,
-    'severity': severity,
+    await FirebaseFirestore.instance.collection('newtickets').doc(time.toString()).set({
+      'description': description,
+      'category': category,
+      'severity': severity,
       'time': time.toString(),
     });
-
-
-
 
     Fluttertoast.showToast(msg: "Saved");
     Navigator.pushNamed(context, '/main-menu');
   }
 
+  void moveTicketToMyQueue(
+    String time,
+    String text,
+    String dropdowncategory,
+    String dropdownseverity,
+  ) async {
+    if (time.isEmpty) {
+      time = DateTime.now().toString();
+    }
+    print('does pass here 1.');
+    // makes a copy of the selected ticket and stores it in a queue specifically for the current user****
+    FirebaseFirestore.instance
+        .collection('tickets')
+        .doc(uid)
+        .collection('myTickets')
+        .doc(time)
+        .set({
+      'description': text,
+      'category': dropdowncategory,
+      'severity': dropdownseverity,
+      'time': time,
+    });
+    print('does pass here 2.');
+    // makes a copy of the selected ticket and stores it in a que that can be viewed by all users****
+    FirebaseFirestore.instance.collection('ticketsInReview').add({
+      'description': text,
+      'category': dropdowncategory,
+      'severity': dropdownseverity,
+      'time': time,
+    });
+    print('does pass here 3.');
+    // finaly removed the ticket from 'newtickets' which is shared amongst all users
+    FirebaseFirestore.instance
+        .collection('newtickets')
+        .doc(time)
+        .delete();
+    Fluttertoast.showToast(msg: "Moved to my queue.");
+    Navigator.pushNamed(context, '/main-menu');
+    print('does pass here 4.');
+  }
+
+  // this makes a copy of the selected ticket, makes a copy in a user specific queue,
+  // IF THE USER IS A non-IT, and then deletes the ticket from the shared queue
   void closeTicket(
     String time,
     String text,
     String dropdowncategory,
     String dropdownseverity,
   ) async {
+    if (time.isEmpty) {
+      time = DateTime.now().toString();
+    }
+
+    // moves the ticket to a closed tickets viewable specifically by the current user
     FirebaseFirestore.instance
         .collection('tickets')
         .doc(uid)
         .collection('closedTickets')
-        .doc(time.toString())
+        .doc(time)
         .set({
       'description': text,
       'category': dropdowncategory,
@@ -103,10 +136,11 @@ class TicketFormState extends State<TicketForm> {
       'time': time,
     });
 
+    // removed the ticket from newTickets viewable by all**
     FirebaseFirestore.instance
         .collection(fields['mainCollection']!)
         .doc(uid)
-        .collection('newTickets')
+        .collection('newtickets')
         .doc(time)
         .delete();
     Fluttertoast.showToast(msg: "Moved to closed.");
@@ -118,11 +152,17 @@ class TicketFormState extends State<TicketForm> {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     isExistingTicket = arguments['isExistingTicket'] ?? false;
+    print(arguments['description']);
+    print(arguments['category']);
+    print(arguments['severity']);
     if (isExistingTicket) {
       discriptionController.text = arguments['description'];
       dropdowncategory = arguments['category'];
       dropdownseverity = arguments['severity'];
-      time = arguments['time'];
+      if (arguments['time'] != null) {
+        time = arguments['time'];
+      }
+
       if (arguments['isTicketClosed'] != null) {
         isTicketClosed = arguments['isTicketClosed'];
       }
@@ -271,18 +311,28 @@ class TicketFormState extends State<TicketForm> {
                               ),
                         ),
                         onPressed: () {
-                          isExistingTicket
-                              ? closeTicket(time, discriptionController.text,
-                                  dropdowncategory, dropdownseverity)
-                              : createTicket(
-                                  discriptionController.text.trim(),
-                                  categoryController.value,
-                                  severityController.value);
+                          if (isExistingTicket) {
+                            if (UniqueUserData.companyRole == 'IT') {
+                              moveTicketToMyQueue(
+                                  time,
+                                  discriptionController.text,
+                                  dropdowncategory,
+                                  dropdownseverity);
+                            } else {
+                              closeTicket(time, discriptionController.text,
+                                  dropdowncategory, dropdownseverity);
+                            }
+                          } else {
+                            createTicket(
+                                discriptionController.text.trim(),
+                                categoryController.value,
+                                severityController.value);
+                          }
                         },
                         // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                         child: Text(() {
-                          if (companyRole == 'IT') {
-                            return 'Move to open ticket queue';
+                          if (UniqueUserData.companyRole == 'IT') {
+                            return 'Move To My Ticket Queue';
                           } else {
                             if (isExistingTicket) {
                               return 'Close Ticket';

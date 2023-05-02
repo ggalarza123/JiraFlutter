@@ -8,6 +8,7 @@ import '../ticketactivity/closedticketlistscreen.dart';
 import '../ticketactivity/newticketlistscreen.dart';
 import '../ticketactivity/newticketscreen.dart';
 import '../ticketactivity/ticketscreen.dart';
+import 'identifyuser.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
 
           if (snapshot.hasData) {
-            return MainMenuActivity(title: "Menu Directory Page");
+            return IdentifyUserActivity();
           } else {
             return AuthActivity();
           }
@@ -40,8 +41,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/login': ((context) => AuthActivity()),
-        '/main-menu': ((context) =>
-            const MainMenuActivity(title: "Menu Directory Page")),
+        // '/main-menu': ((context) =>
+        //     const MainMenuActivity(title: "Menu Directory Page")),
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
         '/openticketform': ((context) => NewTicketActivity()),

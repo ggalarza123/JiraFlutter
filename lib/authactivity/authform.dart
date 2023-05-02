@@ -54,9 +54,7 @@ class AuthFormState extends State<AuthForm> {
     final uid = user!.uid;
     var time = DateTime.now();
     await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('userDetails')
+        .collection('userdetails')
         .doc(time.toString())
         .set({
       'email': email,
