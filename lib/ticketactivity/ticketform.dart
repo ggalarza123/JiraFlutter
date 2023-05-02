@@ -76,6 +76,7 @@ class TicketFormState extends State<TicketForm> {
     String dropdowncategory,
     String dropdownseverity,
   ) async {
+    print('we are in start of moveTicketToMyQueue');
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
@@ -138,8 +139,6 @@ class TicketFormState extends State<TicketForm> {
 
     // removed the ticket from newTickets viewable by all**
     FirebaseFirestore.instance
-        .collection(fields['mainCollection']!)
-        .doc(uid)
         .collection('newtickets')
         .doc(time)
         .delete();
@@ -152,9 +151,6 @@ class TicketFormState extends State<TicketForm> {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     isExistingTicket = arguments['isExistingTicket'] ?? false;
-    print(arguments['description']);
-    print(arguments['category']);
-    print(arguments['severity']);
     if (isExistingTicket) {
       discriptionController.text = arguments['description'];
       dropdowncategory = arguments['category'];
@@ -312,7 +308,9 @@ class TicketFormState extends State<TicketForm> {
                         ),
                         onPressed: () {
                           if (isExistingTicket) {
+                            print('is existing');
                             if (UniqueUserData.companyRole == 'IT') {
+                              print('we are IT');
                               moveTicketToMyQueue(
                                   time,
                                   discriptionController.text,

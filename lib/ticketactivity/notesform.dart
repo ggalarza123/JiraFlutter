@@ -4,19 +4,16 @@ import 'package:jira_imitation_app/ticketactivity/ticketform.dart';
 class NotesForm extends StatefulWidget {
   const NotesForm({super.key});
 
-
   @override
   NotesFormState createState() => NotesFormState();
 }
 
 class NotesFormState extends State<NotesForm> {
-
   final notesController = TextEditingController();
   final messagesController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
       child: Form(
         child: Column(
           children: [
@@ -31,8 +28,10 @@ class NotesFormState extends State<NotesForm> {
               minLines: 3,
               maxLines: null,
               decoration: const InputDecoration(
-                  filled: true, fillColor: Colors.grey,
-                  border: OutlineInputBorder(), labelText: "Noted here."),
+                  filled: true,
+                  fillColor: Colors.grey,
+                  border: OutlineInputBorder(),
+                  labelText: "Notes here..."),
             ),
             const SizedBox(
               height: 10,
@@ -48,10 +47,11 @@ class NotesFormState extends State<NotesForm> {
               minLines: 3,
               maxLines: null,
               decoration: const InputDecoration(
-                  filled: true, fillColor: Colors.grey,
-                  border: OutlineInputBorder(), labelText: "Messages..."),
+                  filled: true,
+                  fillColor: Colors.grey,
+                  border: OutlineInputBorder(),
+                  labelText: "Messages..."),
             ),
-
           ],
         ),
       ),

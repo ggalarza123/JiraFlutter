@@ -1,32 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notesform.dart';
 
-
-class NewTicketForm extends StatefulWidget {
-  NewTicketForm({Key? key}) : super(key: key);
+class TicketInProgressForm extends StatefulWidget {
+  TicketInProgressForm({Key? key}) : super(key: key);
   @override
-  NewTicketFormState createState() => NewTicketFormState();
+  TicketInProgressFormState createState() => TicketInProgressFormState();
 }
 
-Future<bool?> loadTicket() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isTicketOpen');
-}
-
-class NewTicketFormState extends State<NewTicketForm> {
-
+class TicketInProgressFormState extends State<TicketInProgressForm> {
+  late bool isExistingTicket = true;
+  late bool isTicketClosed = false;
+  late String description;
 // Initial Selected Value
-  String dropdownvalue = 'Bug';
-  String dropdownvalue2 = 'Low';
+  String dropdowncategory = 'Bug';
+  String dropdownseverity = 'Low';
+  String time = "";
   final discriptionController = TextEditingController();
-  final categoryController = ValueNotifier<String>("Bug");
-  final severityController = ValueNotifier<String>("Low");
-  // List of items in our dropdown menu
-  var items = [
+  late final categoryController = ValueNotifier<String>(dropdowncategory);
+  late final severityController = ValueNotifier<String>(dropdownseverity);
+// List of items in our dropdown menu
+  var categoryList = [
     'Bug',
     'Incident',
     'Task',
@@ -35,20 +34,77 @@ class NewTicketFormState extends State<NewTicketForm> {
     'Underwriting'
   ];
 
-  var items2 = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
+  var severityList = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
 
-  void createTicket(
-      String description, String category, String severity) async {
-    await FirebaseFirestore.instance.collection('newtickets').add({
-      'description': description,
-      'category': category,
-      'severity': severity,
+  String companyRole = "";
+  String uid = "";
+  @override
+  void initState() {
+    super.initState();
+    getUID();
+  }
+
+  getUID() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    setState(() {
+      uid = user!.uid;
+    });
+  }
+
+  var fields = {'mainCollection': 'tickets'};
+  void moveToCompletedTickets(
+    String time,
+    String text,
+    String dropdowncategory,
+    String dropdownseverity,
+  ) async {
+    if (time.isEmpty) {
+      time = DateTime.now().toString();
+    }
+
+    // moves the ticket to a closed tickets viewable specifically by the current user (maybe by specific time actually)
+    FirebaseFirestore.instance
+        .collection('tickets')
+        .doc(uid)
+        .collection('closedTickets')
+        .doc(time)
+        .set({
+      'description': text,
+      'category': dropdowncategory,
+      'severity': dropdownseverity,
+      'time': time,
     });
 
+    // removed the ticket from newTickets viewable by all**
+    FirebaseFirestore.instance
+        .collection(fields['mainCollection']!)
+        .doc(uid)
+        .collection('myTickets')
+        .doc(time)
+        .delete();
+    Fluttertoast.showToast(msg: "Moved to completed");
+    Navigator.pushNamed(context, '/main-menu');
   }
 
   @override
   Widget build(BuildContext context) {
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    isExistingTicket = arguments['isExistingTicket'] ?? false;
+    if (isExistingTicket) {
+      discriptionController.text = arguments['description'];
+      dropdowncategory = arguments['category'];
+      dropdownseverity = arguments['severity'];
+      if (arguments['time'] != null) {
+        time = arguments['time'];
+      }
+
+      if (arguments['isTicketClosed'] != null) {
+        isTicketClosed = arguments['isTicketClosed'];
+      }
+    }
+
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
@@ -115,7 +171,7 @@ class NewTicketFormState extends State<NewTicketForm> {
                       dropdownColor: Colors.grey,
                       isExpanded: true,
                       // Array list of items
-                      items: items.map((String items) {
+                      items: categoryList.map((String items) {
                         return DropdownMenuItem(
                           value: items,
                           child: Text(items),
@@ -157,11 +213,10 @@ class NewTicketFormState extends State<NewTicketForm> {
                       value: severityController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
-                      dropdownColor: const Color.fromRGBO(
-                          231, 232, 232, 1.0),
+                      dropdownColor: const Color.fromRGBO(231, 232, 232, 1.0),
                       isExpanded: true,
                       // Array list of items
-                      items: items2.map((String items) {
+                      items: severityList.map((String items) {
                         return DropdownMenuItem(
                           value: items,
                           child: Text(items),
@@ -189,11 +244,14 @@ class NewTicketFormState extends State<NewTicketForm> {
                                 fontSize: 22,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
-                        createTicket(discriptionController.text.trim(),
-                            categoryController.value, severityController.value);
+                        Fluttertoast.showToast(
+                            msg: "Currently not available",
+                            toastLength: Toast.LENGTH_SHORT);
+                        // createTicket(discriptionController.text.trim(),
+                        //     categoryController.value, severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Save updated ticket'),
@@ -216,13 +274,15 @@ class NewTicketFormState extends State<NewTicketForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
-
+                        Fluttertoast.showToast(
+                            msg: "Currently not available",
+                            toastLength: Toast.LENGTH_SHORT);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
-                      child: Text('Send creator of ticket message.'),
+                      child: Text('Send Creator Of Ticket A Message'),
                     ),
                   ),
                   const SizedBox(
@@ -238,13 +298,19 @@ class NewTicketFormState extends State<NewTicketForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
-
+                        moveToCompletedTickets(time,
+                            discriptionController.text,
+                            dropdowncategory,
+                            dropdownseverity);
+                        // Fluttertoast.showToast(
+                        //     msg: "Currently not available",
+                        //     toastLength: Toast.LENGTH_SHORT);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
-                      child: Text('Mark as completed'),
+                      child: Text('Move To Completed'),
                     ),
                   ),
                 ],
@@ -255,5 +321,4 @@ class NewTicketFormState extends State<NewTicketForm> {
       ),
     );
   }
-
 }

@@ -54,7 +54,7 @@ class TicketInProgressListPageState extends State<TicketInProgressListPage> {
                     return ListTile(
                       onTap: () {
                         // code to open ticket item details
-                        Navigator.pushNamed(context, '/ticket-form',
+                        Navigator.pushNamed(context, '/ticketInTheWorksQueue',
                             arguments: {
                               'severity': docs[index]['severity'],
                               'category': docs[index]['category'],

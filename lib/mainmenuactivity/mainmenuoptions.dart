@@ -56,7 +56,6 @@ class MenuViewPageState extends State<MenuView> {
                     } else {
                       Navigator.pushNamed(context, '/newticketlist');
                     }
-
                   },
                   child: Text(() {
                     if (UniqueUserData.companyRole == 'IT') {
@@ -81,16 +80,11 @@ class MenuViewPageState extends State<MenuView> {
                         ),
                   ),
                   onPressed: () {
-
                     if (UniqueUserData.companyRole != 'IT') {
                       Navigator.pushNamed(context, '/newticketlist');
                     } else {
-                      // testlistInProgressPageTickets
-                      Navigator.pushNamed(context, '/testlistInProgressPageTickets');
-                     // myTicketQueue does not yet exsist, once created need to place here *************************
-                     //  **************************
+                      Navigator.pushNamed(context, '/ticketsInProgressList');
                     }
-
                   },
                   child: Text(() {
                     if (UniqueUserData.companyRole == 'IT') {
@@ -118,9 +112,9 @@ class MenuViewPageState extends State<MenuView> {
                     if (UniqueUserData.companyRole != 'IT') {
                       Navigator.pushNamed(context, '/closedticketlist');
                     } else {
+                      Navigator.pushNamed(context, '/closedticketlist');
                       // NEED completed ticket queue
                     }
-
                   },
                   child: Text(() {
                     if (UniqueUserData.companyRole == 'IT') {

@@ -78,6 +78,7 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
                       trailing: Icon(Icons.remove_red_eye_outlined),
                     );
                   });
+
             }
           },
         ),

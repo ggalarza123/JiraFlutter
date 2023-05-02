@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../ticketactivity/closedticketlistscreen.dart';
 import '../ticketactivity/newticketlistscreen.dart';
-import '../ticketactivity/newticketscreen.dart';
+import '../ticketactivity/ticketinprogressscreen.dart';
 import '../ticketactivity/ticketscreen.dart';
 import '../authactivity/authscreen.dart';
 import '../mainmenuactivity/menuscreen.dart';
@@ -25,7 +25,6 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
     return user!.uid;
   }
 
-
   @override
   Widget build(BuildContext context) {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -45,7 +44,10 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
             print('company-role: ${document['company-role']}');
           });
 
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+
+            print('snapshot had data');
+            print(snapshot.data!.docs);
             final companyRole = snapshot.data!.docs.first['company-role'];
             UniqueUserData.companyRole = companyRole;
             UniqueUserData.userName = snapshot.data!.docs.first['username'];
@@ -55,6 +57,15 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
             // } else {
             //   return AuthActivity();
             // }
+          }
+
+          if (snapshot.data!.docs.isEmpty) {
+            print('NO DATA');
+            final companyRole = "Operations";
+            UniqueUserData.companyRole = companyRole;
+            UniqueUserData.userName ="unkown";
+            return MainMenuActivity(
+                title: "Menu Directory Page", companyRole: companyRole);
           }
 
           return AuthActivity();
@@ -68,13 +79,13 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
             )),
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
-        '/openticketform': ((context) => NewTicketActivity()),
+        '/ticketInTheWorksQueue': ((context) => ExistingTicketInTheWorksActivity()),
         '/newticketlist': ((context) =>
             NewTicketListPage(title: "New Tickets")),
         '/closedticketlist': ((context) => ClosedTicketListPage(
               title: 'Closed Tickets',
             )),
-        '/testlistInProgressPageTickets': ((context) => TicketInProgressListPage()),
+        '/ticketsInProgressList': ((context) => TicketInProgressListPage()),
       },
     );
   }

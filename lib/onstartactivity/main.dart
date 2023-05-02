@@ -6,7 +6,7 @@ import '../authactivity/authscreen.dart';
 import '../mainmenuactivity/menuscreen.dart';
 import '../ticketactivity/closedticketlistscreen.dart';
 import '../ticketactivity/newticketlistscreen.dart';
-import '../ticketactivity/newticketscreen.dart';
+import '../ticketactivity/ticketinprogressscreen.dart';
 import '../ticketactivity/ticketscreen.dart';
 import 'identifyuser.dart';
 
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         //     const MainMenuActivity(title: "Menu Directory Page")),
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
-        '/openticketform': ((context) => NewTicketActivity()),
+        '/openticketform': ((context) => ExistingTicketInTheWorksActivity()),
         '/newticketlist': ((context) =>
             NewTicketListPage(title: "New Tickets")),
         '/closedticketlist': ((context) => ClosedTicketListPage(
