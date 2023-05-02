@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../authactivity/authscreen.dart';
 import '../mainmenuactivity/menuscreen.dart';
+import '../ticketactivity/closedticketlistscreen.dart';
 import '../ticketactivity/newticketlistscreen.dart';
 import '../ticketactivity/newticketscreen.dart';
 import '../ticketactivity/ticketscreen.dart';
@@ -16,9 +17,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-
-  final Stream<QuerySnapshot> _userStream =
-      FirebaseFirestore.instance.collection('users').snapshots();
 
   // This widget is the root of this application.
   @override
@@ -45,7 +43,11 @@ class MyApp extends StatelessWidget {
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
         '/openticketform': ((context) => NewTicketActivity()),
-        '/newticketlist': ((context) => NewTicketListPage(title: "New Tickets")),
+        '/newticketlist': ((context) =>
+            NewTicketListPage(title: "New Tickets")),
+        '/closedticketlist': ((context) => ClosedTicketListPage(
+              title: 'Closed Tickets',
+            )),
       },
     );
   }

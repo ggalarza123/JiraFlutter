@@ -4,15 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-class NewTicketListPage extends StatefulWidget {
-  const NewTicketListPage({super.key, required this.title});
+class ClosedTicketListPage extends StatefulWidget {
+  const ClosedTicketListPage({super.key, required this.title});
   final String title;
 
   @override
-  State<NewTicketListPage> createState() => NewTicketListPageState();
+  State<ClosedTicketListPage> createState() => ClosedTicketListPageState();
 }
 
-class NewTicketListPageState extends State<NewTicketListPage> {
+class ClosedTicketListPageState extends State<ClosedTicketListPage> {
   String uid = "";
   @override
   void initState() {
@@ -30,7 +30,6 @@ class NewTicketListPageState extends State<NewTicketListPage> {
   var fields = {'mainCollection': 'tickets'};
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +38,7 @@ class NewTicketListPageState extends State<NewTicketListPage> {
       ),
       body: Container(
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection(fields['mainCollection']!).doc(uid).collection('newTickets').snapshots(),
+          stream: FirebaseFirestore.instance.collection(fields['mainCollection']!).doc(uid).collection('closedTickets').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(child: CircularProgressIndicator());
@@ -57,6 +56,7 @@ class NewTicketListPageState extends State<NewTicketListPage> {
                           'description': docs[index]['description'],
                           'time': docs[index]['time'],
                           'isExistingTicket': true,
+                          'isTicketClosed': true,
                         });
                       },
                       title: Row(
@@ -71,7 +71,7 @@ class NewTicketListPageState extends State<NewTicketListPage> {
                           Text(docs[index]['severity']),
                         ],
                       ),
-                      trailing: Icon(Icons.edit),
+                      trailing: Icon(Icons.remove_red_eye_outlined),
                     );
                   });
             }

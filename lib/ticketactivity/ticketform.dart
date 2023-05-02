@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'newticketform.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TicketForm extends StatefulWidget {
   TicketForm({Key? key}) : super(key: key);
@@ -12,21 +12,21 @@ class TicketForm extends StatefulWidget {
   TicketFormState createState() => TicketFormState();
 }
 
-Future<bool?> loadTicket() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isTicketOpen');
-}
-
 class TicketFormState extends State<TicketForm> {
+  var fields = {'mainCollection': 'tickets'};
 
+  late bool isExistingTicket;
+  late bool isTicketClosed = false;
+  late String description;
 // Initial Selected Value
-  String dropdownvalue = 'Bug';
-  String dropdownvalue2 = 'Low';
+  String dropdowncategory = 'Bug';
+  String dropdownseverity = 'Low';
+  String time = "";
   final discriptionController = TextEditingController();
-  final categoryController = ValueNotifier<String>("Bug");
-  final severityController = ValueNotifier<String>("Low");
+  late final categoryController = ValueNotifier<String>(dropdowncategory);
+  late final severityController = ValueNotifier<String>(dropdownseverity);
   // List of items in our dropdown menu
-  var items = [
+  var categoryList = [
     'Bug',
     'Incident',
     'Task',
@@ -35,20 +35,75 @@ class TicketFormState extends State<TicketForm> {
     'Underwriting'
   ];
 
-  var items2 = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
+  var severityList = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
+
+  String companyRole = "";
+  String uid = "";
+  @override
+  void initState() {
+    super.initState();
+    getUID();
+  }
+
+  getUID() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    setState(() {
+      uid = user!.uid;
+    });
+  }
+
 
   void createTicket(
       String description, String category, String severity) async {
-    await FirebaseFirestore.instance.collection('newtickets').add({
-      'description': description,
-      'category': category,
-      'severity': severity,
-    });
 
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    final uid = user!.uid;
+    var time = DateTime.now();
+
+
+    await FirebaseFirestore.instance.collection('tickets').doc(uid).collection('newTickets').doc(time.toString()).set(
+      { 'description': description,
+        'category': category,
+        'severity': severity,
+        'time': time.toString(),
+      });
+    Fluttertoast.showToast(msg: "Saved");
+    Navigator.pushNamed(context, '/main-menu');
   }
+
+  void closeTicket(String time, String text, String dropdowncategory, String dropdownseverity, ) async {
+
+  FirebaseFirestore.instance.collection('tickets').doc(uid).collection('closedTickets').doc(time.toString()).set(
+        { 'description': text,
+          'category': dropdowncategory,
+          'severity': dropdownseverity,
+          'time': time,
+        });
+
+  FirebaseFirestore.instance.collection(fields['mainCollection']!).doc(uid).collection('newTickets').doc(time).delete();
+  Fluttertoast.showToast(msg: "Moved to closed.");
+  Navigator.pushNamed(context, '/main-menu');
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    isExistingTicket = arguments['isExistingTicket'] ?? false;
+    if (isExistingTicket) {
+      discriptionController.text = arguments['description'];
+      dropdowncategory = arguments['category'];
+      dropdownseverity = arguments['severity'];
+      time = arguments['time'];
+      if (arguments['isTicketClosed'] != null) {
+        isTicketClosed = arguments['isTicketClosed'];
+      }
+
+    }
+
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
@@ -115,7 +170,7 @@ class TicketFormState extends State<TicketForm> {
                       dropdownColor: Colors.grey,
                       isExpanded: true,
                       // Array list of items
-                      items: items.map((String items) {
+                      items: categoryList.map((String items) {
                         return DropdownMenuItem(
                           value: items,
                           child: Text(items),
@@ -157,11 +212,10 @@ class TicketFormState extends State<TicketForm> {
                       value: severityController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
-                      dropdownColor: const Color.fromRGBO(
-                          231, 232, 232, 1.0),
+                      dropdownColor: const Color.fromRGBO(231, 232, 232, 1.0),
                       isExpanded: true,
                       // Array list of items
-                      items: items2.map((String items) {
+                      items: severityList.map((String items) {
                         return DropdownMenuItem(
                           value: items,
                           child: Text(items),
@@ -179,6 +233,7 @@ class TicketFormState extends State<TicketForm> {
                   const SizedBox(
                     height: 20,
                   ),
+                  if (!isTicketClosed)
                   SizedBox(
                     height: 60,
                     width: double.infinity,
@@ -192,11 +247,25 @@ class TicketFormState extends State<TicketForm> {
                             ),
                       ),
                       onPressed: () {
-                        createTicket(discriptionController.text.trim(),
-                            categoryController.value, severityController.value);
+                        isExistingTicket
+                            ? closeTicket(time, discriptionController.text, dropdowncategory, dropdownseverity)
+                            : createTicket(
+                                discriptionController.text.trim(),
+                                categoryController.value,
+                                severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
-                      child: Text('CREATE TICKET'),
+                      child: Text(() {
+                        if (companyRole == 'IT') {
+                          return 'Move to open ticket queue';
+                        } else {
+                          if (isExistingTicket ) {
+                            return 'Close Ticket';
+                          } else {
+                            return 'Create New Ticket';
+                          }
+                        }
+                      }()),
                     ),
                   ),
                   const SizedBox(
@@ -210,5 +279,4 @@ class TicketFormState extends State<TicketForm> {
       ),
     );
   }
-
 }

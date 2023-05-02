@@ -13,7 +13,7 @@ class _ticketState extends State<AddTicketActivity> {
     // Scaffold holds pretty much the app bar and the body of a page
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Ticket'),
+        title: Text('Ticket'),
       ),
       body: TicketForm(),
     );

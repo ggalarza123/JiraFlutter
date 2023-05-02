@@ -43,15 +43,17 @@ class AuthFormState extends State<AuthForm> {
     await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim());
+
     addUserDetails(emailController.text.trim(), userNameController.text.trim(),
         roleController.value.trim());
   }
 
   Future addUserDetails(String email, String username, String role) async {
-    await FirebaseFirestore.instance.collection('users').add({
+    await FirebaseFirestore.instance.collection('userdetails').add({
       'email': email,
       'username': username,
       'company-role': role,
+      'userID': FirebaseAuth.instance.currentUser?.uid,
     });
     Navigator.pushNamed(context, '/main-menu');
   }
