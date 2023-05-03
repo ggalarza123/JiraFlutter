@@ -230,7 +230,7 @@ class TicketFormState extends State<TicketForm> {
                       // Update the controller with the new value entered by the user
                       discriptionController.text = value;
                     },
-                    enabled: !isTicketClosed,
+                    enabled: !isTicketClosed && UniqueUserData.companyRole != 'IT',
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";

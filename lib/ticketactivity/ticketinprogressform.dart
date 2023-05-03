@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../onstartactivity/uniqueuserdata.dart';
 import 'notesform.dart';
 
 class TicketInProgressForm extends StatefulWidget {
@@ -59,7 +60,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     }
     print(time); // good
     print("discreption controller: " + discriptionController.text.trim());
-    print("descreiption: " +description); // bad
+    print("descreiption: " + description); // bad
     print(categoryController.value); // good
     print(severityController.value); // good
     // moves the ticket to a closed tickets viewable specifically by the current user
@@ -76,7 +77,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
       'creatorUid': creatorUid,
       'closerUid': uid,
     });
-  // move the ticket to a closed tickets viewable specifically by the user who create it
+    // move the ticket to a closed tickets viewable specifically by the user who create it
     FirebaseFirestore.instance
         .collection('tickets')
         .doc(creatorUid)
@@ -102,15 +103,16 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-          (route) => false,
+      (route) => false,
     );
   }
+
   Future<void> updateTicket(
       String time, String description, String category, String severity) async {
     try {
       print(time); // good
       print("discreption controller: " + discriptionController.text.trim());
-      print("descreiption: " +description); // bad
+      print("descreiption: " + description); // bad
       print(categoryController.value); // good
       print(severityController.value); // good
       await FirebaseFirestore.instance
@@ -187,7 +189,9 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                       // Update the controller with the new value entered by the user
                       discriptionController.text = value;
                     },
-                    enabled: !isTicketClosed,
+                    // the description can only be edited by the creator of the ticket, severity level and ticket catgeory can be edited by either
+                    enabled:
+                        !isTicketClosed && UniqueUserData.companyRole != 'IT',
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";
@@ -299,11 +303,8 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                             ),
                       ),
                       onPressed: () {
-                        updateTicket(
-                            time,
-                            description,
-                            categoryController.value,
-                            severityController.value);
+                        updateTicket(time, description,
+                            categoryController.value, severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Save updated ticket'),
@@ -357,14 +358,17 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                           description = discriptionController.text.trim();
                         }
                         print(time); // good
-                        print("discreption controller: " + discriptionController.text.trim());
-                        print("descreiption: " +description); // bad
+                        print("discreption controller: " +
+                            discriptionController.text.trim());
+                        print("descreiption: " + description); // bad
                         print(categoryController.value); // good
                         print(severityController.value); // good
-                        moveToCompletedTickets( time,
+                        moveToCompletedTickets(
+                            time,
                             description,
                             categoryController.value,
-                            severityController.value, creatorUid);
+                            severityController.value,
+                            creatorUid);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Move To Completed'),
