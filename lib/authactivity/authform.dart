@@ -69,13 +69,13 @@ class AuthFormState extends State<AuthForm> {
     Navigator.pushNamed(context, '/main-menu');
   }
 
-  // NEW code
   Future signIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
+      Fluttertoast.showToast(msg: "Logged In Successfully");
       // Login successful, navigate to home screen or perform other actions
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {

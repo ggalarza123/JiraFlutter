@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../onstartactivity/uniqueuserdata.dart';
+
 class NewTicketListPage extends StatefulWidget {
   const NewTicketListPage({super.key, required this.title});
   final String title;
@@ -37,8 +39,12 @@ class NewTicketListPageState extends State<NewTicketListPage> {
       ),
       body: Container(
         child: StreamBuilder(
-          stream:
-              FirebaseFirestore.instance.collection('newtickets').snapshots(),
+          stream: UniqueUserData.companyRole == 'IT'
+              ? FirebaseFirestore.instance.collection('newtickets').snapshots()
+              : FirebaseFirestore.instance
+              .collection('newtickets')
+              .where('creatorUid', isEqualTo: uid)
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(child: CircularProgressIndicator());
