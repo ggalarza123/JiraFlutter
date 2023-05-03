@@ -105,7 +105,11 @@ class TicketFormState extends State<TicketForm> {
     // finaly removed the ticket from 'newtickets' which is shared amongst all users
     FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
     Fluttertoast.showToast(msg: "Moved to my queue.");
-    Navigator.pushNamed(context, '/main-menu');
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main-menu',
+          (route) => false,
+    );
   }
 
   // this makes a copy of the selected ticket, makes a copy in a user specific queue,
@@ -134,7 +138,11 @@ class TicketFormState extends State<TicketForm> {
     // removed the ticket from newTickets viewable by the user who closed the ticket
     FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
     Fluttertoast.showToast(msg: "Moved to closed");
-    Navigator.pushNamed(context, '/main-menu');
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main-menu',
+          (route) => false,
+    );
   }
 
   @override

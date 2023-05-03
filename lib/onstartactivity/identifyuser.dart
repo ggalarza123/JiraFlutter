@@ -55,7 +55,6 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
           }
 
           if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            print('NO DATA');
             final companyRole = "Operations";
             UniqueUserData.companyRole = companyRole;
             UniqueUserData.userName = "unkown";

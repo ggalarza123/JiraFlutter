@@ -96,7 +96,11 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
         .doc(time)
         .delete();
     Fluttertoast.showToast(msg: "Moved to completed");
-    Navigator.pushNamed(context, '/main-menu');
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main-menu',
+          (route) => false,
+    );
   }
 
   @override
@@ -198,9 +202,6 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                       // After selecting the desired option,it will
                       // change button value to selected value
                       onChanged: (String? newValue) {
-                        // or just
-                        // categoryController.value = newValue!;
-                        // without the setState method
                         setState(() {
                           categoryController.value = newValue!;
                         });
@@ -268,8 +269,6 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                         Fluttertoast.showToast(
                             msg: "Currently not available",
                             toastLength: Toast.LENGTH_SHORT);
-                        // createTicket(discriptionController.text.trim(),
-                        //     categoryController.value, severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Save updated ticket'),
@@ -321,9 +320,6 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                       onPressed: () {
                         moveToCompletedTickets(time, discriptionController.text,
                             dropdowncategory, dropdownseverity, creatorUid);
-                        // Fluttertoast.showToast(
-                        //     msg: "Currently not available",
-                        //     toastLength: Toast.LENGTH_SHORT);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Move To Completed'),
