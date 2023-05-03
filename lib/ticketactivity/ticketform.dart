@@ -74,7 +74,7 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-      (route) => false,
+          (route) => false,
     );
   }
 
@@ -123,7 +123,7 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-      (route) => false,
+          (route) => false,
     );
   }
 
@@ -156,7 +156,7 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-      (route) => false,
+          (route) => false,
     );
   }
 
@@ -170,7 +170,7 @@ class TicketFormState extends State<TicketForm> {
   @override
   Widget build(BuildContext context) {
     final arguments =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     isExistingTicket = arguments['isExistingTicket'] ?? false;
     if (isExistingTicket) {
       discriptionController.text = arguments['description'];
@@ -279,10 +279,10 @@ class TicketFormState extends State<TicketForm> {
                       onChanged: isTicketClosed
                           ? null
                           : (String? newValue) {
-                              setState(() {
-                                categoryController.value = newValue!;
-                              });
-                            },
+                        setState(() {
+                          categoryController.value = newValue!;
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -322,10 +322,10 @@ class TicketFormState extends State<TicketForm> {
                       onChanged: isTicketClosed
                           ? null
                           : (String? newValue) {
-                              setState(() {
-                                severityController.value = newValue!;
-                              });
-                            },
+                        setState(() {
+                          severityController.value = newValue!;
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -341,17 +341,17 @@ class TicketFormState extends State<TicketForm> {
                         children: [
                           !isTicketClosed
                               ? const TextSpan(
-                                  text: 'Pending Review',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                )
+                            text: 'Pending Review',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          )
                               : const TextSpan(
-                                  text: 'Closed',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
+                            text: 'Closed',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -418,13 +418,13 @@ class TicketFormState extends State<TicketForm> {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.teal),
+                          MaterialStateProperty.all<Color>(Colors.teal),
                           textStyle: MaterialStateProperty.all<TextStyle>(
                               const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight
                                       .bold) // Change the font size to 20
-                              ),
+                          ),
                         ),
                         onPressed: () {
                           updateTicket(

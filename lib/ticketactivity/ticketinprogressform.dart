@@ -58,11 +58,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
-    print(time); // good
-    print("discreption controller: " + discriptionController.text.trim());
-    print("descreiption: " + description); // bad
-    print(categoryController.value); // good
-    print(severityController.value); // good
+
     // moves the ticket to a closed tickets viewable specifically by the current user
     FirebaseFirestore.instance
         .collection('tickets')
@@ -103,7 +99,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-      (route) => false,
+          (route) => false,
     );
   }
 
@@ -121,7 +117,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
           .collection('myTickets')
           .doc(time)
           .update({
-        'description': description,
+        'description': discriptionController.text.trim(),
         'category': category,
         'severity': severity,
       });
@@ -135,7 +131,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
   @override
   Widget build(BuildContext context) {
     final arguments =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     isExistingTicket = arguments['isExistingTicket'] ?? false;
     if (isExistingTicket) {
       discriptionController.text = arguments['description'];
@@ -191,7 +187,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                     },
                     // the description can only be edited by the creator of the ticket, severity level and ticket catgeory can be edited by either
                     enabled:
-                        !isTicketClosed && UniqueUserData.companyRole != 'IT',
+                    !isTicketClosed && UniqueUserData.companyRole != 'IT',
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";
@@ -300,7 +296,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 22,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                            ),
+                        ),
                       ),
                       onPressed: () {
                         updateTicket(time, description,
@@ -327,7 +323,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                            ),
+                        ),
                       ),
                       onPressed: () {
                         Fluttertoast.showToast(
@@ -351,18 +347,12 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                            ),
+                        ),
                       ),
                       onPressed: () {
                         if (description.isEmpty || description == null) {
                           description = discriptionController.text.trim();
                         }
-                        print(time); // good
-                        print("discreption controller: " +
-                            discriptionController.text.trim());
-                        print("descreiption: " + description); // bad
-                        print(categoryController.value); // good
-                        print(severityController.value); // good
                         moveToCompletedTickets(
                             time,
                             description,

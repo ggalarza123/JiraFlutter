@@ -85,6 +85,8 @@ class TicketInProgressListPageState extends State<TicketInProgressListPage> {
                                   'description': docs[index]['description'],
                                 if (docs[index].data().containsKey('time'))
                                   'time': docs[index]['time'],
+                                if (docs[index].data().containsKey('notes'))
+                                  'notes': docs[index]['notes'],
                                 if (docs[index]
                                     .data()
                                     .containsKey('creatorUid'))
