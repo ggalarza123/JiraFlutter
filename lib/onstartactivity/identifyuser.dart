@@ -31,14 +31,19 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
     final User? user = auth.currentUser;
 
     return MaterialApp(
-// This code now identifies the user
+      // This code now identifies the user
       home: StreamBuilder(
-        stream: FirebaseFirestore.instance
+        stream: user == null
+            ? null
+            : FirebaseFirestore.instance
             .collection('userdetails')
-            .where('email', isEqualTo: user!.email)
+            .where('email', isEqualTo: user.email)
             .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          snapshot.data!.docs.forEach((document) {});
+        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.hasData && snapshot.data != null && snapshot.data!.docs.isNotEmpty) {
+            snapshot.data!.docs.forEach((document) {});
+          }
+
 
           if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
             final companyRole = snapshot.data!.docs.first['company-role'];
@@ -49,7 +54,7 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
                 title: "Menu Directory Page", companyRole: companyRole);
           }
 
-          if (snapshot.data!.docs.isEmpty) {
+          if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
             print('NO DATA');
             final companyRole = "Operations";
             UniqueUserData.companyRole = companyRole;
@@ -64,9 +69,9 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
       routes: {
         '/login': ((context) => AuthActivity()),
         '/main-menu': ((context) => MainMenuActivity(
-              title: "Menu Directory Page",
-              companyRole: '',
-            )),
+          title: "Menu Directory Page",
+          companyRole: '',
+        )),
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
         '/ticketInTheWorksQueue': ((context) =>
@@ -74,8 +79,8 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
         '/newticketlist': ((context) =>
             NewTicketListPage(title: "New Tickets")),
         '/closedticketlist': ((context) => ClosedTicketListPage(
-              title: 'Closed Tickets',
-            )),
+          title: 'Closed Tickets',
+        )),
         '/ticketsInProgressList': ((context) => TicketInProgressListPage()),
       },
     );
