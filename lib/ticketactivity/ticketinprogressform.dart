@@ -14,7 +14,7 @@ class TicketInProgressForm extends StatefulWidget {
 class TicketInProgressFormState extends State<TicketInProgressForm> {
   late bool isExistingTicket = true;
   late bool isTicketClosed = false;
-  late String description;
+  String description = "";
   late String creatorUid;
 // Initial Selected Value
   String dropdowncategory = 'Bug';
@@ -57,7 +57,11 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
-
+    print(time); // good
+    print("discreption controller: " + discriptionController.text.trim());
+    print("descreiption: " +description); // bad
+    print(categoryController.value); // good
+    print(severityController.value); // good
     // moves the ticket to a closed tickets viewable specifically by the current user
     FirebaseFirestore.instance
         .collection('tickets')
@@ -100,6 +104,30 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
       '/main-menu',
           (route) => false,
     );
+  }
+  Future<void> updateTicket(
+      String time, String description, String category, String severity) async {
+    try {
+      print(time); // good
+      print("discreption controller: " + discriptionController.text.trim());
+      print("descreiption: " +description); // bad
+      print(categoryController.value); // good
+      print(severityController.value); // good
+      await FirebaseFirestore.instance
+          .collection(fields['mainCollection']!)
+          .doc(uid)
+          .collection('myTickets')
+          .doc(time)
+          .update({
+        'description': description,
+        'category': category,
+        'severity': severity,
+      });
+      Fluttertoast.showToast(msg: "Updates saved!");
+      print('Ticket updated successfully!');
+    } catch (e) {
+      print('Error updating ticket: $e');
+    }
   }
 
   @override
@@ -151,15 +179,22 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                     ),
                   ),
                   TextFormField(
-                    controller: discriptionController,
                     minLines: 2,
                     maxLines: null,
+                    onChanged: (value) {
+                      // Update the class variable
+                      description = value;
+                      // Update the controller with the new value entered by the user
+                      discriptionController.text = value;
+                    },
+                    enabled: !isTicketClosed,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";
                       }
                       return null;
                     },
+                    initialValue: arguments['description'] ?? '',
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: "Enter a description"),
@@ -264,9 +299,11 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                             ),
                       ),
                       onPressed: () {
-                        Fluttertoast.showToast(
-                            msg: "Currently not available",
-                            toastLength: Toast.LENGTH_SHORT);
+                        updateTicket(
+                            time,
+                            description,
+                            categoryController.value,
+                            severityController.value);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Save updated ticket'),
@@ -316,8 +353,18 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                             ),
                       ),
                       onPressed: () {
-                        moveToCompletedTickets(time, discriptionController.text,
-                            dropdowncategory, dropdownseverity, creatorUid);
+                        if (description.isEmpty || description == null) {
+                          description = discriptionController.text.trim();
+                        }
+                        print(time); // good
+                        print("discreption controller: " + discriptionController.text.trim());
+                        print("descreiption: " +description); // bad
+                        print(categoryController.value); // good
+                        print(severityController.value); // good
+                        moveToCompletedTickets( time,
+                            description,
+                            categoryController.value,
+                            severityController.value, creatorUid);
                       },
                       // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                       child: Text('Move To Completed'),

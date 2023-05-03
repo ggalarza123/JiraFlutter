@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jira_imitation_app/onstartactivity/uniqueuserdata.dart';
 
-
 class TicketForm extends StatefulWidget {
   TicketForm({Key? key}) : super(key: key);
   @override
@@ -79,12 +78,9 @@ class TicketFormState extends State<TicketForm> {
     );
   }
 
-  Future<void> updateTicket(String time, String description, String category, String severity) async {
+  Future<void> updateTicket(
+      String time, String description, String category, String severity) async {
     try {
-      print(time);
-      print(description);
-      print(category);
-      print(severity);
       await FirebaseFirestore.instance
           .collection('newtickets')
           .doc(time)
@@ -194,7 +190,6 @@ class TicketFormState extends State<TicketForm> {
       }
     }
 
-
     if (UniqueUserData.companyRole != 'IT' && isExistingTicket) {
       buttonStyle = buttonStyle.copyWith(
         backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
@@ -227,12 +222,12 @@ class TicketFormState extends State<TicketForm> {
                     ),
                   ),
                   TextFormField(
-                    // controller: discriptionController,
                     minLines: 2,
                     maxLines: null,
                     onChanged: (value) {
-                      // Update the controller with the new value entered by the user
+                      // Update the class variable
                       description = value;
+                      // Update the controller with the new value entered by the user
                       discriptionController.text = value;
                     },
                     enabled: !isTicketClosed,
@@ -376,15 +371,15 @@ class TicketFormState extends State<TicketForm> {
                               moveTicketToMyQueue(
                                   time,
                                   discriptionController.text,
-                                  dropdowncategory,
-                                  dropdownseverity,
+                                  categoryController.value,
+                                  severityController.value,
                                   creatorUid);
                             } else {
                               closeTicket(
                                   time,
                                   discriptionController.text,
-                                  dropdowncategory,
-                                  dropdownseverity,
+                                  categoryController.value,
+                                  severityController.value,
                                   creatorUid);
                             }
                           } else {
@@ -431,11 +426,13 @@ class TicketFormState extends State<TicketForm> {
                                       .bold) // Change the font size to 20
                               ),
                         ),
-                        onPressed: () {updateTicket(time,
-                            description,
-                            categoryController.value,
-                            severityController.value
-                           );},
+                        onPressed: () {
+                          updateTicket(
+                              time,
+                              description,
+                              categoryController.value,
+                              severityController.value);
+                        },
                         // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
                         child: Text('Update Ticket'),
                       ),
