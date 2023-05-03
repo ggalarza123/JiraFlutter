@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jira_imitation_app/onstartactivity/uniqueuserdata.dart';
 
+
 class TicketForm extends StatefulWidget {
   TicketForm({Key? key}) : super(key: key);
   @override
@@ -16,7 +17,6 @@ class TicketFormState extends State<TicketForm> {
 
   late bool isExistingTicket;
   late bool isTicketClosed = false;
-  late String description;
   late String creatorUid;
 // Initial Selected Value
   String dropdowncategory = 'Bug';
@@ -36,7 +36,7 @@ class TicketFormState extends State<TicketForm> {
   ];
 
   var severityList = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
-
+  String description = "";
   String companyRole = "";
   String uid = "";
   @override
@@ -75,14 +75,33 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-          (route) => false,
+      (route) => false,
     );
+  }
 
+  Future<void> updateTicket(String time, String description, String category, String severity) async {
+    try {
+      print(time);
+      print(description);
+      print(category);
+      print(severity);
+      await FirebaseFirestore.instance
+          .collection('newtickets')
+          .doc(time)
+          .update({
+        'description': description,
+        'category': category,
+        'severity': severity,
+      });
+      Fluttertoast.showToast(msg: "Saved");
+      print('Ticket updated successfully!');
+    } catch (e) {
+      print('Error updating ticket: $e');
+    }
   }
 
   void moveTicketToMyQueue(String time, String text, String dropdowncategory,
       String dropdownseverity, String creatorUid) async {
-    print('we are in start of moveTicketToMyQueue');
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
@@ -108,7 +127,7 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -141,9 +160,16 @@ class TicketFormState extends State<TicketForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-          (route) => false,
+      (route) => false,
     );
   }
+
+  ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+    textStyle: const TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +192,13 @@ class TicketFormState extends State<TicketForm> {
         // early ticket, had no creator field
         creatorUid = "No creator saved";
       }
+    }
+
+
+    if (UniqueUserData.companyRole != 'IT' && isExistingTicket) {
+      buttonStyle = buttonStyle.copyWith(
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+      );
     }
 
     return SizedBox(
@@ -194,9 +227,14 @@ class TicketFormState extends State<TicketForm> {
                     ),
                   ),
                   TextFormField(
-                    controller: discriptionController,
+                    // controller: discriptionController,
                     minLines: 2,
                     maxLines: null,
+                    onChanged: (value) {
+                      // Update the controller with the new value entered by the user
+                      description = value;
+                      discriptionController.text = value;
+                    },
                     enabled: !isTicketClosed,
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -204,6 +242,7 @@ class TicketFormState extends State<TicketForm> {
                       }
                       return null;
                     },
+                    initialValue: arguments['description'] ?? '',
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: "Enter a description"),
@@ -229,7 +268,7 @@ class TicketFormState extends State<TicketForm> {
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: dropdowncategory,
+                      value: categoryController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
                       dropdownColor: Colors.grey,
@@ -246,13 +285,19 @@ class TicketFormState extends State<TicketForm> {
                           ? null
                           : (String? newValue) {
                               setState(() {
-                                dropdowncategory = newValue!;
+                                categoryController.value = newValue!;
                               });
                             },
                     ),
                   ),
                   const SizedBox(
                     height: 10,
+                  ),
+                  const Positioned(
+                    child: Text(
+                      'Severity level:',
+                      style: TextStyle(fontSize: 14),
+                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -266,7 +311,7 @@ class TicketFormState extends State<TicketForm> {
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: dropdownseverity,
+                      value: severityController.value,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
                       dropdownColor: const Color.fromRGBO(231, 232, 232, 1.0),
@@ -283,7 +328,7 @@ class TicketFormState extends State<TicketForm> {
                           ? null
                           : (String? newValue) {
                               setState(() {
-                                dropdownseverity = newValue!;
+                                severityController.value = newValue!;
                               });
                             },
                     ),
@@ -324,19 +369,10 @@ class TicketFormState extends State<TicketForm> {
                       height: 60,
                       width: double.infinity,
                       child: ElevatedButton(
-                        style: ButtonStyle(
-                          textStyle: MaterialStateProperty.all<TextStyle>(
-                              const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight
-                                      .bold) // Change the font size to 20
-                              ),
-                        ),
+                        style: buttonStyle,
                         onPressed: () {
                           if (isExistingTicket) {
-                            print('is existing');
                             if (UniqueUserData.companyRole == 'IT') {
-                              print('we are IT');
                               moveTicketToMyQueue(
                                   time,
                                   discriptionController.text,
@@ -356,7 +392,6 @@ class TicketFormState extends State<TicketForm> {
                                 discriptionController.text.trim(),
                                 categoryController.value,
                                 severityController.value);
-
                           }
                         },
                         // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
@@ -373,9 +408,38 @@ class TicketFormState extends State<TicketForm> {
                         }()),
                       ),
                     ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  if (isExistingTicket &&
+                      UniqueUserData.companyRole != 'IT' &&
+                      !isTicketClosed)
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  if (isExistingTicket &&
+                      UniqueUserData.companyRole != 'IT' &&
+                      !isTicketClosed)
+                    SizedBox(
+                      height: 60,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.teal),
+                          textStyle: MaterialStateProperty.all<TextStyle>(
+                              const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight
+                                      .bold) // Change the font size to 20
+                              ),
+                        ),
+                        onPressed: () {updateTicket(time,
+                            description,
+                            categoryController.value,
+                            severityController.value
+                           );},
+                        // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
+                        child: Text('Update Ticket'),
+                      ),
+                    ),
                 ],
               ),
             ),

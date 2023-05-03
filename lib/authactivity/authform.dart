@@ -3,13 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/cupertino.dart';
-// ggala
-// fake4@gmail.com
-// 123gg123GG!@
 
-// 123gg
-// fake9@gmail.com
-// 123gg123GG!@
+// operations@gmail.com
+// 1234geo1234G!
+
+// itperson@gmail.com
+// 1234geo1234G!
 
 class AuthForm extends StatefulWidget {
   const AuthForm({super.key});

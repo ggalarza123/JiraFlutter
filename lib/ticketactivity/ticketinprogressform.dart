@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'notesform.dart';
 
 class TicketInProgressForm extends StatefulWidget {
@@ -115,7 +114,6 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
       if (arguments['time'] != null) {
         time = arguments['time'];
       }
-
       if (arguments['isTicketClosed'] != null) {
         isTicketClosed = arguments['isTicketClosed'];
       }
