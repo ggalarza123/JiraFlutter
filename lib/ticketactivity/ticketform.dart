@@ -72,7 +72,12 @@ class TicketFormState extends State<TicketForm> {
     });
 
     Fluttertoast.showToast(msg: "Saved");
-    Navigator.pushNamed(context, '/main-menu');
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/main-menu',
+          (route) => false,
+    );
+
   }
 
   void moveTicketToMyQueue(String time, String text, String dropdowncategory,
@@ -96,17 +101,6 @@ class TicketFormState extends State<TicketForm> {
       'creatorUid': creatorUid,
       'ticketReviewerUid': uid,
     });
-
-    // makes a copy of the selected ticket and stores it in a que that can be viewed by all users****
-    // DONT NEED THIS CODE UNLESS A NEW QUEUE IS DISPLAYED TO NON-IT AS IN REVIEW QUEUE
-    // FirebaseFirestore.instance.collection('ticketsInReview').add({
-    //   'description': text,
-    //   'category': dropdowncategory,
-    //   'severity': dropdownseverity,
-    //   'time': time,
-    //   'creatorUid': creatorUid,
-    //   'ticketReviewerUid': uid,
-    // });
 
     // finaly removed the ticket from 'newtickets' which is shared amongst all users
     FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
@@ -354,6 +348,7 @@ class TicketFormState extends State<TicketForm> {
                                 discriptionController.text.trim(),
                                 categoryController.value,
                                 severityController.value);
+
                           }
                         },
                         // ***** This will be both the create ticket for user side, and the move to open ticket on admin side***
