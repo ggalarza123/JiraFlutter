@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../onstartactivity/uniqueuserdata.dart';
+import 'notes.dart';
 import 'notesform.dart';
 
 class TicketInProgressForm extends StatefulWidget {
@@ -35,7 +36,6 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
   ];
 
   var severityList = ['Low', 'Medium', 'High', 'Urgent', 'Catastrophe'];
-
   String companyRole = "";
   String uid = "";
   @override
@@ -99,18 +99,13 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main-menu',
-          (route) => false,
+      (route) => false,
     );
   }
 
   Future<void> updateTicket(
       String time, String description, String category, String severity) async {
     try {
-      print(time); // good
-      print("discreption controller: " + discriptionController.text.trim());
-      print("descreiption: " + description); // bad
-      print(categoryController.value); // good
-      print(severityController.value); // good
       await FirebaseFirestore.instance
           .collection(fields['mainCollection']!)
           .doc(uid)
@@ -120,6 +115,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
         'description': discriptionController.text.trim(),
         'category': category,
         'severity': severity,
+        'notes': Notes.notes,
       });
       Fluttertoast.showToast(msg: "Updates saved!");
       print('Ticket updated successfully!');
@@ -131,7 +127,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
   @override
   Widget build(BuildContext context) {
     final arguments =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     isExistingTicket = arguments['isExistingTicket'] ?? false;
     if (isExistingTicket) {
       discriptionController.text = arguments['description'];
@@ -187,7 +183,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                     },
                     // the description can only be edited by the creator of the ticket, severity level and ticket catgeory can be edited by either
                     enabled:
-                    !isTicketClosed && UniqueUserData.companyRole != 'IT',
+                        !isTicketClosed && UniqueUserData.companyRole != 'IT',
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";
@@ -296,7 +292,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 22,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
                         updateTicket(time, description,
@@ -309,7 +305,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                   const SizedBox(
                     height: 20,
                   ),
-                  NotesForm(),
+                  NotesForm(notes: Notes.notes),
                   const SizedBox(
                     height: 20,
                   ),
@@ -323,7 +319,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
                         Fluttertoast.showToast(
@@ -347,7 +343,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                                 fontSize: 16,
                                 fontWeight: FontWeight
                                     .bold) // Change the font size to 20
-                        ),
+                            ),
                       ),
                       onPressed: () {
                         if (description.isEmpty || description == null) {

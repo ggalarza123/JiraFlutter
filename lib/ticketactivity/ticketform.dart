@@ -68,6 +68,9 @@ class TicketFormState extends State<TicketForm> {
       'severity': severity,
       'time': time.toString(),
       'creatorUid': uid,
+      'notes': "",
+      'IT-comments': "",
+      'creator-comments': "",
     });
 
     Fluttertoast.showToast(msg: "Saved");
@@ -115,6 +118,9 @@ class TicketFormState extends State<TicketForm> {
       'time': time,
       'creatorUid': creatorUid,
       'ticketReviewerUid': uid,
+      'notes': "",
+      'IT-comments': "",
+      'creator-comments': "",
     });
 
     // finaly removed the ticket from 'newtickets' which is shared amongst all users

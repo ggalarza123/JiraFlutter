@@ -88,6 +88,10 @@ class NewTicketListPageState extends State<NewTicketListPage> {
                                   'time': docs[index]['time'],
                                 if (docs[index].data().containsKey('notes'))
                                   'notes': docs[index]['notes'],
+                                if (docs[index].data().containsKey('IT-comments'))
+                                  'IT-comments': docs[index]['IT-comments'],
+                                if (docs[index].data().containsKey('creator-comments'))
+                                  'creator-comments': docs[index]['creator-comments'],
                                 if (docs[index]
                                     .data()
                                     .containsKey('creatorUid'))
