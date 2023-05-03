@@ -81,7 +81,7 @@ class TicketFormState extends State<TicketForm> {
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
-    print('does pass here 1.');
+
     // makes a copy of the selected ticket and stores it in a queue specifically for the current user****
     FirebaseFirestore.instance
         .collection('tickets')
@@ -96,22 +96,22 @@ class TicketFormState extends State<TicketForm> {
       'creatorUid': creatorUid,
       'ticketReviewerUid': uid,
     });
-    print('does pass here 2.');
+
     // makes a copy of the selected ticket and stores it in a que that can be viewed by all users****
-    FirebaseFirestore.instance.collection('ticketsInReview').add({
-      'description': text,
-      'category': dropdowncategory,
-      'severity': dropdownseverity,
-      'time': time,
-      'creatorUid': creatorUid,
-      'ticketReviewerUid': uid,
-    });
-    print('does pass here 3.');
+    // DONT NEED THIS CODE UNLESS A NEW QUEUE IS DISPLAYED TO NON-IT AS IN REVIEW QUEUE
+    // FirebaseFirestore.instance.collection('ticketsInReview').add({
+    //   'description': text,
+    //   'category': dropdowncategory,
+    //   'severity': dropdownseverity,
+    //   'time': time,
+    //   'creatorUid': creatorUid,
+    //   'ticketReviewerUid': uid,
+    // });
+
     // finaly removed the ticket from 'newtickets' which is shared amongst all users
     FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
     Fluttertoast.showToast(msg: "Moved to my queue.");
     Navigator.pushNamed(context, '/main-menu');
-    print('does pass here 4.');
   }
 
   // this makes a copy of the selected ticket, makes a copy in a user specific queue,

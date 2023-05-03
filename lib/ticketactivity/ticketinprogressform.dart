@@ -59,10 +59,24 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
       time = DateTime.now().toString();
     }
 
-    // moves the ticket to a closed tickets viewable specifically by the current user (maybe by specific time actually)
+    // moves the ticket to a closed tickets viewable specifically by the current user
     FirebaseFirestore.instance
         .collection('tickets')
         .doc(uid)
+        .collection('closedTickets')
+        .doc(time)
+        .set({
+      'description': text,
+      'category': dropdowncategory,
+      'severity': dropdownseverity,
+      'time': time,
+      'creatorUid': creatorUid,
+      'closerUid': uid,
+    });
+  // move the ticket to a closed tickets viewable specifically by the user who create it
+    FirebaseFirestore.instance
+        .collection('tickets')
+        .doc(creatorUid)
         .collection('closedTickets')
         .doc(time)
         .set({
