@@ -17,6 +17,7 @@ class TicketFormState extends State<TicketForm> {
   late bool isExistingTicket;
   late bool isTicketClosed = false;
   late String description;
+  late String creatorUid;
 // Initial Selected Value
   String dropdowncategory = 'Bug';
   String dropdownseverity = 'Low';
@@ -59,23 +60,23 @@ class TicketFormState extends State<TicketForm> {
     final uid = user!.uid;
     var time = DateTime.now();
 
-    await FirebaseFirestore.instance.collection('newtickets').doc(time.toString()).set({
+    await FirebaseFirestore.instance
+        .collection('newtickets')
+        .doc(time.toString())
+        .set({
       'description': description,
       'category': category,
       'severity': severity,
       'time': time.toString(),
+      'creatorUid': uid,
     });
 
     Fluttertoast.showToast(msg: "Saved");
     Navigator.pushNamed(context, '/main-menu');
   }
 
-  void moveTicketToMyQueue(
-    String time,
-    String text,
-    String dropdowncategory,
-    String dropdownseverity,
-  ) async {
+  void moveTicketToMyQueue(String time, String text, String dropdowncategory,
+      String dropdownseverity, String creatorUid) async {
     print('we are in start of moveTicketToMyQueue');
     if (time.isEmpty) {
       time = DateTime.now().toString();
@@ -92,6 +93,8 @@ class TicketFormState extends State<TicketForm> {
       'category': dropdowncategory,
       'severity': dropdownseverity,
       'time': time,
+      'creatorUid': creatorUid,
+      'ticketReviewerUid': uid,
     });
     print('does pass here 2.');
     // makes a copy of the selected ticket and stores it in a que that can be viewed by all users****
@@ -100,13 +103,12 @@ class TicketFormState extends State<TicketForm> {
       'category': dropdowncategory,
       'severity': dropdownseverity,
       'time': time,
+      'creatorUid': creatorUid,
+      'ticketReviewerUid': uid,
     });
     print('does pass here 3.');
     // finaly removed the ticket from 'newtickets' which is shared amongst all users
-    FirebaseFirestore.instance
-        .collection('newtickets')
-        .doc(time)
-        .delete();
+    FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
     Fluttertoast.showToast(msg: "Moved to my queue.");
     Navigator.pushNamed(context, '/main-menu');
     print('does pass here 4.');
@@ -114,12 +116,8 @@ class TicketFormState extends State<TicketForm> {
 
   // this makes a copy of the selected ticket, makes a copy in a user specific queue,
   // IF THE USER IS A non-IT, and then deletes the ticket from the shared queue
-  void closeTicket(
-    String time,
-    String text,
-    String dropdowncategory,
-    String dropdownseverity,
-  ) async {
+  void closeTicket(String time, String text, String dropdowncategory,
+      String dropdownseverity, String creatorUid) async {
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
@@ -135,13 +133,12 @@ class TicketFormState extends State<TicketForm> {
       'category': dropdowncategory,
       'severity': dropdownseverity,
       'time': time,
+      'creatorUid': creatorUid,
+      'closerUid': uid,
     });
 
     // removed the ticket from newTickets viewable by all**
-    FirebaseFirestore.instance
-        .collection('newtickets')
-        .doc(time)
-        .delete();
+    FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
     Fluttertoast.showToast(msg: "Moved to closed.");
     Navigator.pushNamed(context, '/main-menu');
   }
@@ -158,9 +155,14 @@ class TicketFormState extends State<TicketForm> {
       if (arguments['time'] != null) {
         time = arguments['time'];
       }
-
       if (arguments['isTicketClosed'] != null) {
         isTicketClosed = arguments['isTicketClosed'];
+      }
+      if (arguments['creatorUid'] != null) {
+        creatorUid = arguments['creatorUid'];
+      } else {
+        // early ticket, had no creator field
+        creatorUid = "No creator saved";
       }
     }
 
@@ -293,6 +295,34 @@ class TicketFormState extends State<TicketForm> {
                   const SizedBox(
                     height: 20,
                   ),
+                  if (isExistingTicket)
+                    Text.rich(
+                      TextSpan(
+                        text: 'Status: ',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                        children: [
+                          !isTicketClosed
+                              ? const TextSpan(
+                                  text: 'Pending Review',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                )
+                              : const TextSpan(
+                                  text: 'Closed',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
+                  if (isExistingTicket)
+                    const SizedBox(
+                      height: 20,
+                    ),
                   if (!isTicketClosed)
                     SizedBox(
                       height: 60,
@@ -315,10 +345,15 @@ class TicketFormState extends State<TicketForm> {
                                   time,
                                   discriptionController.text,
                                   dropdowncategory,
-                                  dropdownseverity);
+                                  dropdownseverity,
+                                  creatorUid);
                             } else {
-                              closeTicket(time, discriptionController.text,
-                                  dropdowncategory, dropdownseverity);
+                              closeTicket(
+                                  time,
+                                  discriptionController.text,
+                                  dropdowncategory,
+                                  dropdownseverity,
+                                  creatorUid);
                             }
                           } else {
                             createTicket(

@@ -31,6 +31,8 @@ class NewTicketListPageState extends State<NewTicketListPage> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -57,6 +59,10 @@ class NewTicketListPageState extends State<NewTicketListPage> {
                               'description': docs[index]['description'],
                               if (docs[index].data().containsKey('time'))
                               'time': docs[index]['time'],
+                              if (docs[index].data().containsKey('creatorUid'))
+                                'creatorUid': docs[index]['creatorUid'],
+                              if (docs[index].data().containsKey('creatorUid'))
+                                'creatorUid': docs[index]['creatorUid'],
                               'isExistingTicket': true,
                             });
                       },

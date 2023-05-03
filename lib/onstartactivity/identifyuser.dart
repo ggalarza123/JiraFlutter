@@ -38,32 +38,22 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
             .where('email', isEqualTo: user!.email)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          print("size " + snapshot.data!.size.toString());
-          snapshot.data!.docs.forEach((document) {
-            print('Email: ${document['email']}');
-            print('company-role: ${document['company-role']}');
-          });
+          snapshot.data!.docs.forEach((document) {});
 
           if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-
-            print('snapshot had data');
-            print(snapshot.data!.docs);
             final companyRole = snapshot.data!.docs.first['company-role'];
             UniqueUserData.companyRole = companyRole;
             UniqueUserData.userName = snapshot.data!.docs.first['username'];
-            // if (companyRole == 'IT') {
+
             return MainMenuActivity(
                 title: "Menu Directory Page", companyRole: companyRole);
-            // } else {
-            //   return AuthActivity();
-            // }
           }
 
           if (snapshot.data!.docs.isEmpty) {
             print('NO DATA');
             final companyRole = "Operations";
             UniqueUserData.companyRole = companyRole;
-            UniqueUserData.userName ="unkown";
+            UniqueUserData.userName = "unkown";
             return MainMenuActivity(
                 title: "Menu Directory Page", companyRole: companyRole);
           }
@@ -79,7 +69,8 @@ class IdentifyUserActivityState extends State<IdentifyUserActivity> {
             )),
         '/signup': ((context) => AuthActivity()),
         '/ticket-form': ((context) => AddTicketActivity()),
-        '/ticketInTheWorksQueue': ((context) => ExistingTicketInTheWorksActivity()),
+        '/ticketInTheWorksQueue': ((context) =>
+            ExistingTicketInTheWorksActivity()),
         '/newticketlist': ((context) =>
             NewTicketListPage(title: "New Tickets")),
         '/closedticketlist': ((context) => ClosedTicketListPage(

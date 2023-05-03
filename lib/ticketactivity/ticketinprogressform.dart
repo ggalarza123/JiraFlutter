@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notesform.dart';
 
@@ -17,6 +16,7 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
   late bool isExistingTicket = true;
   late bool isTicketClosed = false;
   late String description;
+  late String creatorUid;
 // Initial Selected Value
   String dropdowncategory = 'Bug';
   String dropdownseverity = 'Low';
@@ -53,12 +53,8 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
   }
 
   var fields = {'mainCollection': 'tickets'};
-  void moveToCompletedTickets(
-    String time,
-    String text,
-    String dropdowncategory,
-    String dropdownseverity,
-  ) async {
+  void moveToCompletedTickets(String time, String text, String dropdowncategory,
+      String dropdownseverity, String creatorUid) async {
     if (time.isEmpty) {
       time = DateTime.now().toString();
     }
@@ -74,6 +70,8 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
       'category': dropdowncategory,
       'severity': dropdownseverity,
       'time': time,
+      'creatorUid': creatorUid,
+      'closerUid': uid,
     });
 
     // removed the ticket from newTickets viewable by all**
@@ -102,6 +100,12 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
 
       if (arguments['isTicketClosed'] != null) {
         isTicketClosed = arguments['isTicketClosed'];
+      }
+      if (arguments['creatorUid'] != null) {
+        creatorUid = arguments['creatorUid'];
+      } else {
+        // early ticket, had no creator field
+        creatorUid = "No creator saved";
       }
     }
 
@@ -301,10 +305,8 @@ class TicketInProgressFormState extends State<TicketInProgressForm> {
                             ),
                       ),
                       onPressed: () {
-                        moveToCompletedTickets(time,
-                            discriptionController.text,
-                            dropdowncategory,
-                            dropdownseverity);
+                        moveToCompletedTickets(time, discriptionController.text,
+                            dropdowncategory, dropdownseverity, creatorUid);
                         // Fluttertoast.showToast(
                         //     msg: "Currently not available",
                         //     toastLength: Toast.LENGTH_SHORT);

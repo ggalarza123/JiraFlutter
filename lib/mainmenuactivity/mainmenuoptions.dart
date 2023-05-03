@@ -96,6 +96,7 @@ class MenuViewPageState extends State<MenuView> {
                 ),
               ),
               const SizedBox(height: 50),
+
               SizedBox(
                 width: 250,
                 height: 60,

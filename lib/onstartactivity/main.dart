@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../authactivity/authscreen.dart';
-import '../mainmenuactivity/menuscreen.dart';
 import '../ticketactivity/closedticketlistscreen.dart';
 import '../ticketactivity/newticketlistscreen.dart';
 import '../ticketactivity/ticketinprogressscreen.dart';
@@ -29,9 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
-
         builder: (context, snapshot) {
-
           if (snapshot.hasData) {
             return IdentifyUserActivity();
           } else {
