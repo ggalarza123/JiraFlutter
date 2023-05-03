@@ -33,7 +33,7 @@ class TicketInProgressListPageState extends State<TicketInProgressListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text("IF wanted title can go here"),
+        title: Text("Tickets in progress"),
       ),
       body: Container(
         child: StreamBuilder(
@@ -51,33 +51,66 @@ class TicketInProgressListPageState extends State<TicketInProgressListPage> {
               return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        // code to open ticket item details
-                        Navigator.pushNamed(context, '/ticketInTheWorksQueue',
-                            arguments: {
-                              'severity': docs[index]['severity'],
-                              'category': docs[index]['category'],
-                              if (docs[index]['description'] != null)
-                                'description': docs[index]['description'],
-                              if (docs[index].data().containsKey('time'))
-                                'time': docs[index]['time'],
-                              'isExistingTicket': true,
-                            });
-                      },
-                      title: Row(
-                        children: [
-                          Text("Category: "),
-                          Text(docs[index]['category']),
-                        ],
+                    // Set the color based on severity level
+                    Color color;
+                    switch (docs[index]['severity']) {
+                      case 'Medium':
+                        color = Colors.lightBlueAccent;
+                        break;
+                      case 'High':
+                        color = Colors.orange;
+                        break;
+                      case 'Urgent':
+                        color = Colors.redAccent;
+                        break;
+                      case 'Catastrophe':
+                        color = Colors.red;
+                        break;
+                      default:
+                        color = Colors.yellow;
+                        break;
+                    }
+
+                    return Card(
+                      elevation: 2,
+                      color: color, // Set the background color
+                      child: ListTile(
+                        onTap: () {
+                          // code to open ticket item details
+                          Navigator.pushNamed(context, '/ticketInTheWorksQueue',
+                              arguments: {
+                                'severity': docs[index]['severity'],
+                                'category': docs[index]['category'],
+                                if (docs[index]['description'] != null)
+                                  'description': docs[index]['description'],
+                                if (docs[index].data().containsKey('time'))
+                                  'time': docs[index]['time'],
+                                if (docs[index]
+                                    .data()
+                                    .containsKey('creatorUid'))
+                                  'creatorUid': docs[index]['creatorUid'],
+                                'isExistingTicket': true,
+                              });
+
+                        },
+                        title: Row(
+                          children: [
+                            Text("Category: ",
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(docs[index]['category'],
+                                style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                        subtitle: Row(
+                          children: [
+                            Text("Severity Level: ",
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(docs[index]['severity'],
+                                style: TextStyle(fontSize: 14)),
+                          ],
+                        ),
+                        trailing: Icon(Icons.edit),
                       ),
-                      subtitle: Row(
-                        children: [
-                          Text("Severity Level: "),
-                          Text(docs[index]['severity']),
-                        ],
-                      ),
-                      trailing: Icon(Icons.edit),
                     );
                   });
             }

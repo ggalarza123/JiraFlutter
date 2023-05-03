@@ -36,6 +36,11 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
         title: Text(widget.title),
       ),
       body: Container(
+        decoration: BoxDecoration(
+          // border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: EdgeInsets.all(5),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection(fields['mainCollection']!)
@@ -44,38 +49,88 @@ class ClosedTicketListPageState extends State<ClosedTicketListPage> {
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(child: CircularProgressIndicator());
+              return Center(child: CircularProgressIndicator());
             } else {
               final docs = snapshot.data!.docs;
               return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        // code to open ticket item details
-                        Navigator.pushNamed(context, '/ticket-form',
-                            arguments: {
-                              'severity': docs[index]['severity'],
-                              'category': docs[index]['category'],
-                              'description': docs[index]['description'],
-                              'time': docs[index]['time'],
-                              'isExistingTicket': true,
-                              'isTicketClosed': true,
-                            });
-                      },
-                      title: Row(
-                        children: [
-                          Text("Category: "),
-                          Text(docs[index]['category']),
+                    Color backgroundColor;
+                    switch (docs[index]['severity']) {
+                      case 'Medium':
+                        backgroundColor = Colors.lightBlueAccent;
+                        break;
+                      case 'High':
+                        backgroundColor = Colors.orange;
+                        break;
+                      case 'Urgent':
+                        backgroundColor = Colors.redAccent;
+                        break;
+                      case 'Catastrophe':
+                        backgroundColor = Colors.red;
+                        break;
+                      default:
+                        backgroundColor = Colors.yellow;
+                        break;
+                    }
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: backgroundColor,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: Offset(0, 2),
+                          ),
                         ],
                       ),
-                      subtitle: Row(
-                        children: [
-                          Text("Severity Level: "),
-                          Text(docs[index]['severity']),
-                        ],
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: ListTile(
+                        onTap: () {
+                          // code to open ticket item details
+                          Navigator.pushNamed(context, '/ticket-form',
+                              arguments: {
+                                'severity': docs[index]['severity'],
+                                'category': docs[index]['category'],
+                                'description': docs[index]['description'],
+                                'time': docs[index]['time'],
+                                'isExistingTicket': true,
+                                'isTicketClosed': true,
+                              });
+                        },
+                        title: Row(
+                          children: [
+                            const Text(
+                              "Category: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              docs[index]['category'],
+                            ),
+                          ],
+                        ),
+                        subtitle: Row(
+                          children: [
+                            const Text(
+                              "Severity Level: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              docs[index]['severity'],
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Icon(Icons.remove_red_eye_outlined),
                       ),
-                      trailing: Icon(Icons.remove_red_eye_outlined),
                     );
                   });
             }

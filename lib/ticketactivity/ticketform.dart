@@ -137,9 +137,9 @@ class TicketFormState extends State<TicketForm> {
       'closerUid': uid,
     });
 
-    // removed the ticket from newTickets viewable by all**
+    // removed the ticket from newTickets viewable by the user who closed the ticket
     FirebaseFirestore.instance.collection('newtickets').doc(time).delete();
-    Fluttertoast.showToast(msg: "Moved to closed.");
+    Fluttertoast.showToast(msg: "Moved to closed");
     Navigator.pushNamed(context, '/main-menu');
   }
 
@@ -195,6 +195,7 @@ class TicketFormState extends State<TicketForm> {
                     controller: discriptionController,
                     minLines: 2,
                     maxLines: null,
+                    enabled: !isTicketClosed,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Enter a description";
@@ -226,7 +227,7 @@ class TicketFormState extends State<TicketForm> {
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: categoryController.value,
+                      value: dropdowncategory,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
                       dropdownColor: Colors.grey,
@@ -238,26 +239,18 @@ class TicketFormState extends State<TicketForm> {
                           child: Text(items),
                         );
                       }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        // or just
-                        // categoryController.value = newValue!;
-                        // without the setState method
-                        setState(() {
-                          categoryController.value = newValue!;
-                        });
-                      },
+                      // Set onChanged to null to disable changing the selected value
+                      onChanged: isTicketClosed
+                          ? null
+                          : (String? newValue) {
+                              setState(() {
+                                dropdowncategory = newValue!;
+                              });
+                            },
                     ),
                   ),
                   const SizedBox(
                     height: 10,
-                  ),
-                  const Positioned(
-                    child: Text(
-                      'Severity level:',
-                      style: TextStyle(fontSize: 14),
-                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -271,7 +264,7 @@ class TicketFormState extends State<TicketForm> {
                     ),
                     child: DropdownButton(
                       // Initial Value
-                      value: severityController.value,
+                      value: dropdownseverity,
                       // Down Arrow Icon
                       icon: const Icon(Icons.keyboard_arrow_down),
                       dropdownColor: const Color.fromRGBO(231, 232, 232, 1.0),
@@ -283,13 +276,14 @@ class TicketFormState extends State<TicketForm> {
                           child: Text(items),
                         );
                       }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          severityController.value = newValue!;
-                        });
-                      },
+                      // Set onChanged to null to disable changing the selected value
+                      onChanged: isTicketClosed
+                          ? null
+                          : (String? newValue) {
+                              setState(() {
+                                dropdownseverity = newValue!;
+                              });
+                            },
                     ),
                   ),
                   const SizedBox(
